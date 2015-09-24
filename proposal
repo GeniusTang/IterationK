@@ -1,0 +1,5 @@
+1. Start with k=11, using d2, d2star, d2shepp to calculate the distance matrix of species. And transform them into (log(dissimilarity))^2 to make them more linearly related to brach length.
+
+2. Find species ik,jk so that the distance between i,j is the smallest, also use k-1 to find species i(k-1), j(k-1) with smallest distance. If i(k-1) == i and j(k-1) == j, then k doesn't change, group i and j together. Otherwise, decrease k by 1 and group i(k-1) and j(k-1) together.
+
+3. Repeat until all species are clustered.
