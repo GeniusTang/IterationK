@@ -1,0 +1,27 @@
+Parse the arguments to get files and species name.
+
+Save sequences data from files into a list "seq".
+Save species names into another list "species".
+
+Define a function "CountK(k, seqlist)":
+Given k value and seqences list, count the appearance of each kmer in this list
+and return a numpy array.
+For example: 
+D = CountK(6, ['ATCGA', 'TGCAATCG', ...]
+The order is decided by quaternary.
+'A' = 0, 'T' = 1, 'C' = 2, 'G' = 3.
+
+Define a class "Species(name, k, seqlist)":
+let species = Species(name, k)
+then species.name = name, speices.kmer = CountK(k, seqlist)
+
+Define a funtion "Calculate(species1, species2)":
+Given 2 species class, calculate their d2, d2shepp, d2star statistics by species.kmer
+
+Initiate with k=11, calculate the d2statistics for any pair, find the smallest distance.
+Then find the smallest distance for k=10, if the pair is the same as in k=11, k stay unchanged and cluster this pair.
+Otherwise, change k to 10 and cluster the pair that has smallest distance in k=10.
+Repeat, every time compare k=i and k=i-1, if they have the same smallest distance pair, cluster them and k=i,
+otherwise, k=i-1 and cluster the smallest distance pair in k=i-1.
+
+Stop when clustering finishs.
