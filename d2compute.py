@@ -1,5 +1,6 @@
 #!/bin/python
 
+import errmsg
 import optparse
 import kcount
 
@@ -37,9 +38,9 @@ def analyzeInput(file):
   
 #Create a class to save the species name and kmer
 class Species:
-    def __init__(self, name, readlist, k):
+    def __init__(self, name, readlist, k, inputtype):
         self.name = name
-        self.kmer = kcount.create_readlist_kmer(readlist, k)
+        self.kmer, self.kprob = kcount.create_readlist_kmer(readlist, k, inputtype)
         self.M = len(readlist)
         self.Beta = len(readlist[0])
         self.E = self.M * (self.Beta - k + 1) * (0.25**4) * 2
@@ -78,23 +79,31 @@ def main():
     
     #Kvalue
     parser.add_option('-k', action='store', dest='kvalue')
+
+    #Input type
+    parser.add_option('-t', action='store', dest='inputtype',\
+help='L for long sequences, A for fasta files')
+
     options, reminder = parser.parse_args()
     
     inputfile = options.inputfile
     outputprefix = options.outputprefix
-    kvalue = int(options.kvalue) 
+    inputtype = options.inputtype
+
+    kvalue = errmsg.check_k(options.kvalue)
+    errmsg.check_inputfile(inputfile)
+    errmsg.check_inputtype(inputtype)
 
     species, sequences = analyzeInput(inputfile)
     
-    """
-    test = Species(species[0], sequences[0], kvalue)
+    test = Species(species[0], sequences[0], kvalue, inputtype)
     print test.name
     print test.M
     print test.Beta
     print test.E
+    print test.kprob
     for kmer in test.kmer:
         print kmer
-    """
     
      
 if __name__ == '__main__':
