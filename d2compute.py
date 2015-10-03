@@ -43,7 +43,8 @@ class Species:
         self.kmer, self.kprob = kcount.create_readlist_kmer(readlist, k, inputtype)
         self.M = len(readlist)
         self.Beta = len(readlist[0])
-        self.E = self.M * (self.Beta - k + 1) * (0.25**4) * 2
+        self.E = self.M * (self.Beta - k + 1) * self.kprob
+
 '''
 def d2compare(X, Y):
     D2 = sum(X.kmer * Y.kmer)
@@ -100,8 +101,8 @@ help='L for long sequences, A for fasta files')
     print test.name
     print test.M
     print test.Beta
-    print test.E
     print test.kprob
+    print test.E
     for kmer in test.kmer:
         print kmer
     
