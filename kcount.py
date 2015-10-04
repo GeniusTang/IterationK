@@ -35,7 +35,7 @@ def kmer_prob(prob, k):
         quaternary = qua(i, k)
         for base in quaternary:
             kprob[i] *= prob[base]
-    return kprob
+    return (kprob/sum(kprob))
 
 #Generate the kmer count array for one read
 def create_read_kmer(read, k, inputtype):

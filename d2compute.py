@@ -1,5 +1,5 @@
 #!/bin/python
-
+import numpy as np
 import errmsg
 import optparse
 import kcount
@@ -41,31 +41,39 @@ class Species:
     def __init__(self, name, readlist, k, inputtype):
         self.name = name
         self.kmer, self.kprob = kcount.create_readlist_kmer(readlist, k, inputtype)
-        self.M = len(readlist)
-        self.Beta = len(readlist[0])
-        self.E = self.M * (self.Beta - k + 1) * self.kprob
+        self.E = sum(self.kmer) * self.kprob
+        self.tilde = self.kmer - self.E
 
-'''
+def cosine(x, y):
+    return sum(x * y) / (np.sqrt(sum(x**2)) * np.sqrt(sum(y**2)))
+
 def d2compare(X, Y):
-    D2 = sum(X.kmer * Y.kmer)
-    #Read pairs
-    M = X.M 
-    #Read length
-    Beta = X.Beta 
-    #Expectaion of read appearance
-    E = X.E 
+    return (1-cosine(X.kmer, Y.kmer))
     
-    X2 = X.kmer - E
-    Y2 = Y.kmer - E
-    D2star = sum(X2 * Y2 / E)
-    X
-    XYsqrt = np.sqrt((X2**2+Y2**2))
-    D2shepp = sum(X2 * Y2 / XYsqrt) 
+def pairwise(species, sequences, kvalue, inputtype, method):
+    spelist = []
+    spenumber = len(species)
+    distmatrix = np.zeros([spenumber]*2)
+    for i in range(spenumber):
+        spelist.append(Species(species[i], sequences[i], kvalue, inputtype))
+    for i in range(spenumber):
+        for j in range(i+1, spenumber):
+            distance = method(spelist[i], spelist[j])
+            distmatrix[i][j] = distance
+            distmatrix[j][i] = distance
+    return distmatrix
     
-    d2 = 
-'''  
-    
-    
+def formatprint(species, distmatrix, outfile):
+    f = open(outfile, 'wt')
+    spenumber = len(distmatrix)
+    f.write(str(spenumber)+'\n')
+    for i in range(spenumber):
+        f.write('%-9s'%species[i])
+        for j in range(spenumber):
+            f.write(' '+'%.4f'%distmatrix[i][j])
+        f.write('\n')
+    f.close()
+     
 
 
 def main():
@@ -95,17 +103,21 @@ help='L for long sequences, A for fasta files')
     errmsg.check_inputfile(inputfile)
     errmsg.check_inputtype(inputtype)
 
+    
     species, sequences = analyzeInput(inputfile)
-    
-    test = Species(species[0], sequences[0], kvalue, inputtype)
+    distmatrix = pairwise(species, sequences, kvalue, inputtype, d2compare)
+    formatprint(species, distmatrix, outputprefix)
+    '''
+    print distmatrix
+    test1 = Species(species[0], sequences[0], kvalue, inputtype)
+    test2 = Species(species[0], sequences[1], kvalue, inputtype)
     print test.name
-    print test.M
-    print test.Beta
-    print test.kprob
-    print test.E
-    for kmer in test.kmer:
-        print kmer
-    
+    print 'prob: ', test.kprob
+    print 'E: ', test.E
+    print 'tilde: ', test.tilde
+    print 'kmer: ', test.kmer 
+    print d2compare(test1, test2)
+    '''
      
 if __name__ == '__main__':
     main()
