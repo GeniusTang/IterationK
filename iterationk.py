@@ -102,7 +102,7 @@ help='L for long sequences, A for fasta files')
 
     cluster = [i for i in range(len(species))]
     bigk = kvalue
-    smallk = (bigk - 1) if options.iteration else bigk
+    smallk = max([(bigk - 1) if options.iteration else bigk, 3])
     for method in d2method:
         if method == 'd2':
             compare = d2compare
@@ -111,10 +111,10 @@ help='L for long sequences, A for fasta files')
         else:
             compare = d2sheppcompare
         distmatrix_smallk = pairwise(species, sequences, smallk, inputtype, compare)
-        if options.iteration: 
-            distmatrix_bigk = pairwise(species, sequences, bigk, inputtype, compare) 
-        else:
+        if (not options.iteration or smallk == bigk): 
             distmatrix_bigk = distmatrix_smallk 
+        else:
+            distmatrix_bigk = pairwise(species, sequences, bigk, inputtype, compare) 
         while(len(cluster) > 1):
             print "Cluster result:", listprint(cluster, seqdict).replace(',)', ')')[1:-2]+';'
             print '-'*30
@@ -123,8 +123,9 @@ help='L for long sequences, A for fasta files')
             newdist_bigk = averagedist(distmatrix_bigk, cluster)
             decreasek, cluster = iteration(newdist_smallk, newdist_bigk, cluster, seqdict) 
             if decreasek:
-                bigk = smallk
-                smallk = bigk - 1
+                #k is at least 3
+                bigk = max([smallk, 3])
+                smallk = max([bigk - 1, 3])
                 distmatrix_smallk = pairwise(species, sequences, smallk, inputtype, compare)
                 distmatrix_bigk = pairwise(species, sequences, bigk, inputtype, compare)
         print 'Final cluster:', listprint(cluster, seqdict).replace(',)', ')')[1:-2]+';'
