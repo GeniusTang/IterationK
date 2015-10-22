@@ -25,9 +25,9 @@ for j in {1..100};do
     echo -e "${FILEPATH}${M}_k${K}_iter_outtree\nR\nD\n1\n2\nA\nS\nY" > input1
     echo -e "${FILEPATH}${M}_k${K}_outtree\nR\nD\n1\n2\nA\nS\nY" > input2
     rm -rf outfile
-    treedist < input1 > screenout 
+    treedist < input2 > screenout 
     cat outfile >> /home/rcf-40/kujin/panasas/IterationK/RF/T${T}_k${K}_${M}_rf
     rm -rf outfile 
-    treedist < input2 > screenout 
+    treedist < input1 > screenout 
     cat outfile >> /home/rcf-40/kujin/panasas/IterationK/RF/T${T}_iter_k${K}_${M}_rf
 done
